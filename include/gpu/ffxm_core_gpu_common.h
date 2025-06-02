@@ -1,5 +1,5 @@
 // Copyright  © 2023 Advanced Micro Devices, Inc.
-// Copyright  © 2024 Arm Limited.
+// Copyright  © 2024-2025 Arm Limited.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,10 @@
 ///
 /// FFXM_FSR2_OPTION_SHADER_OPT_BALANCED. If defined, optimizations related to the balanced preset will be enabled.
 /// FFXM_FSR2_OPTION_SHADER_OPT_PERFORMANCE. If defined, optimizations related to the performance preset will be enabled.
+/// FFXM_FSR2_OPTION_SHADER_OPT_ULTRA_PERFORMANCE. If defined, optimizations related to the ultra performance preset will be enabled.
+#ifndef FFXM_FSR2_OPTION_SHADER_OPT_ULTRA_PERFORMANCE
+#define FFXM_FSR2_OPTION_SHADER_OPT_ULTRA_PERFORMANCE 0
+#endif
 #ifndef FFXM_FSR2_OPTION_SHADER_OPT_PERFORMANCE
 #define FFXM_FSR2_OPTION_SHADER_OPT_PERFORMANCE 0
 #endif

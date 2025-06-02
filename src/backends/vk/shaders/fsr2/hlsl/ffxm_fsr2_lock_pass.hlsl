@@ -1,5 +1,5 @@
 // Copyright  © 2023 Advanced Micro Devices, Inc.
-// Copyright  © 2024 Arm Limited.
+// Copyright  © 2024-2025 Arm Limited.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -19,7 +19,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if FFXM_FSR2_OPTION_SHADER_OPT_ULTRA_PERFORMANCE
+#define FSR2_BIND_SRV_DILATED_DEPTH_MOTION_VECTORS_INPUT_LUMA 0
+#else
 #define FSR2_BIND_SRV_LOCK_INPUT_LUMA                       0
+#endif
 
 #define FSR2_BIND_UAV_NEW_LOCKS                             1
 #define FSR2_BIND_UAV_RECONSTRUCTED_PREV_NEAREST_DEPTH      2

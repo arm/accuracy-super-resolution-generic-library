@@ -1,5 +1,5 @@
 // Copyright  © 2023 Advanced Micro Devices, Inc.
-// Copyright  © 2024 Arm Limited.
+// Copyright  © 2024-2025 Arm Limited.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -35,17 +35,18 @@ namespace arm
 /// @ingroup FSR2
 typedef enum Fs2ShaderPermutationOptions
 {
-    FSR2_SHADER_PERMUTATION_USE_LANCZOS_TYPE       = (1 << 0),  ///< Off means reference, On means LUT
-    FSR2_SHADER_PERMUTATION_HDR_COLOR_INPUT        = (1 << 1),  ///< Enables the HDR code path
-    FSR2_SHADER_PERMUTATION_LOW_RES_MOTION_VECTORS = (1 << 2),  ///< Indicates low resolution motion vectors provided
-    FSR2_SHADER_PERMUTATION_JITTER_MOTION_VECTORS  = (1 << 3),  ///< Indicates motion vectors were generated with jitter
-    FSR2_SHADER_PERMUTATION_DEPTH_INVERTED         = (1 << 4),  ///< Indicates input resources were generated with inverted depth
-    FSR2_SHADER_PERMUTATION_ENABLE_SHARPENING      = (1 << 5),  ///< Enables a supplementary sharpening pass
-    FSR2_SHADER_PERMUTATION_FORCE_WAVE64           = (1 << 6),  ///< doesn't map to a define, selects different table
-    FSR2_SHADER_PERMUTATION_ALLOW_FP16             = (1 << 7),  ///< Enables fast math computations where possible
-	FSR2_SHADER_PERMUTATION_APPLY_BALANCED_OPT	   = (1 << 8),  ///< Apply optimizations used by "Balanced" preset
-	FSR2_SHADER_PERMUTATION_APPLY_PERFORMANCE_OPT  = (1 << 9),  ///< Apply optimizations used by "Performance" preset
-	FSR2_SHADER_PERMUTATION_PLATFORM_GLES_3_2	   = (1 << 10), ///< Indicates that the upscaler is being run in a GLES 3.2 platform
+    FSR2_SHADER_PERMUTATION_USE_LANCZOS_TYPE            = (1 << 0),  ///< Off means reference, On means LUT
+    FSR2_SHADER_PERMUTATION_HDR_COLOR_INPUT             = (1 << 1),  ///< Enables the HDR code path
+    FSR2_SHADER_PERMUTATION_LOW_RES_MOTION_VECTORS      = (1 << 2),  ///< Indicates low resolution motion vectors provided
+    FSR2_SHADER_PERMUTATION_JITTER_MOTION_VECTORS       = (1 << 3),  ///< Indicates motion vectors were generated with jitter
+    FSR2_SHADER_PERMUTATION_DEPTH_INVERTED              = (1 << 4),  ///< Indicates input resources were generated with inverted depth
+    FSR2_SHADER_PERMUTATION_ENABLE_SHARPENING           = (1 << 5),  ///< Enables a supplementary sharpening pass
+    FSR2_SHADER_PERMUTATION_FORCE_WAVE64                = (1 << 6),  ///< doesn't map to a define, selects different table
+    FSR2_SHADER_PERMUTATION_ALLOW_FP16                  = (1 << 7),  ///< Enables fast math computations where possible
+	FSR2_SHADER_PERMUTATION_APPLY_BALANCED_OPT	        = (1 << 8),  ///< Apply optimizations used by "Balanced" preset
+	FSR2_SHADER_PERMUTATION_APPLY_PERFORMANCE_OPT       = (1 << 9),  ///< Apply optimizations used by "Performance" preset
+	FSR2_SHADER_PERMUTATION_APPLY_ULTRA_PERFORMANCE_OPT = (1 << 10),  ///< Apply optimizations used by "Ultra Performance" preset
+	FSR2_SHADER_PERMUTATION_PLATFORM_GLES_3_2	        = (1 << 11), ///< Indicates that the upscaler is being run in a GLES 3.2 platform
 } Fs2ShaderPermutationOptions;
 
 // Constants for FSR2 dispatches. Must be kept in sync with cbFSR2 in ffx_fsr2_callbacks_hlsl.h

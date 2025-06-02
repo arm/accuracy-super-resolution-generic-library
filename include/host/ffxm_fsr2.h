@@ -1,5 +1,5 @@
 // Copyright  © 2023 Advanced Micro Devices, Inc.
-// Copyright  © 2024 Arm Limited.
+// Copyright  © 2024-2025 Arm Limited.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -121,6 +121,7 @@ typedef enum FfxmFsr2ShaderQualityMode
     FFXM_FSR2_SHADER_QUALITY_MODE_QUALITY                       = 1,        ///< Perform upscaling with a shader quality mode of 'Quality'
     FFXM_FSR2_SHADER_QUALITY_MODE_BALANCED                      = 2,        ///< Perform upscaling with a shader quality mode of 'Balanced'
     FFXM_FSR2_SHADER_QUALITY_MODE_PERFORMANCE                   = 3,        ///< Perform upscaling with a shader quality mode of 'Performance'
+    FFXM_FSR2_SHADER_QUALITY_MODE_ULTRA_PERFORMANCE             = 4,        ///< Perform upscaling with a shader quality mode of 'Ultra Performance'
 } FfxmFsr2ShaderQualityMode;
 
 /// @ingroup ffxmFsr2

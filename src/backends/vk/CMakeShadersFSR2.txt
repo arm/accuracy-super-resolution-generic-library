@@ -1,5 +1,5 @@
 # Copyright  © 2023 Advanced Micro Devices, Inc.
-# Copyright  © 2024 Arm Limited.
+# Copyright  © 2024-2025 Arm Limited.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,8 @@ set(FSR2_PERMUTATION_ARGS
     -DFFXM_FSR2_OPTION_INVERTED_DEPTH={0,1}
     -DFFXM_FSR2_OPTION_APPLY_SHARPENING={0,1}
     -DFFXM_FSR2_OPTION_SHADER_OPT_BALANCED={0,1}
-    -DFFXM_FSR2_OPTION_SHADER_OPT_PERFORMANCE={0,1})
+    -DFFXM_FSR2_OPTION_SHADER_OPT_PERFORMANCE={0,1}
+    -DFFXM_FSR2_OPTION_SHADER_OPT_ULTRA_PERFORMANCE={0,1})
 
 set(FSR2_INCLUDE_ARGS
 	"${FFXM_GPU_PATH}"

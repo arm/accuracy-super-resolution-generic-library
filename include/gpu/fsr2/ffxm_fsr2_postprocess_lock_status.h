@@ -1,5 +1,5 @@
 // Copyright  © 2023 Advanced Micro Devices, Inc.
-// Copyright  © 2024 Arm Limited.
+// Copyright  © 2024-2025 Arm Limited.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -44,6 +44,9 @@ DeclareCustomTextureSample(ShadingChangeLumaSample, Lanczos2, FetchShadingChange
 
 FfxFloat32 GetShadingChangeLuma(FfxInt32x2 iPxHrPos, FfxFloat32x2 fUvCoord)
 {
+#if FFXM_FSR2_OPTION_SHADER_OPT_ULTRA_PERFORMANCE
+    return 1.0;
+#else
     FfxFloat32 fShadingChangeLuma = 0;
     const FfxFloat32 fDiv = FfxFloat32(FfxInt32(2) << LumaMipLevelToUse());
     FfxInt32x2 iMipRenderSize = FfxInt32x2(RenderSize() / fDiv);
@@ -54,6 +57,7 @@ FfxFloat32 GetShadingChangeLuma(FfxInt32x2 iPxHrPos, FfxFloat32x2 fUvCoord)
     fShadingChangeLuma = ffxPow(fShadingChangeLuma, 1.0f / 6.0f);
 
     return fShadingChangeLuma;
+#endif
 }
 
 void UpdateLockStatus(AccumulationPassCommonParams params,

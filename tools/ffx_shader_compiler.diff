@@ -1,3 +1,93 @@
+diff --git a/ThirdParty/Arm_ASR/tools/ffx_shader_compiler/src/compiler.h b/ThirdParty/Arm_ASR/tools/ffx_shader_compiler/src/compiler.h
+index f77f8de6c..ee55462ee 100644
+--- a/ThirdParty/Arm_ASR/tools/ffx_shader_compiler/src/compiler.h
++++ b/ThirdParty/Arm_ASR/tools/ffx_shader_compiler/src/compiler.h
+@@ -87,18 +87,19 @@ struct IReflectionData
+@@ -87,18 +87,19 @@ struct IReflectionData
+diff --git a/ThirdParty/Arm_ASR/tools/ffx_shader_compiler/src/compiler.h b/ThirdParty/Arm_ASR/tools/ffx_shader_compiler/src/compiler.h
+diff --git a/ThirdParty/Arm_ASR/tools/ffx_shader_compiler/src/compiler.h b/ThirdParty/Arm_ASR/tools/ffx_shader_compiler/src/compiler.h
+index f77f8de6c..ee55462ee 100644
+--- a/ThirdParty/Arm_ASR/tools/ffx_shader_compiler/src/compiler.h
++++ b/ThirdParty/Arm_ASR/tools/ffx_shader_compiler/src/compiler.h
+@@ -87,18 +87,19 @@ struct IReflectionData
+diff --git a/ThirdParty/Arm_ASR/tools/ffx_shader_compiler/src/compiler.h b/ThirdParty/Arm_ASR/tools/ffx_shader_compiler/src/compiler.h
+index f77f8de6c..ee55462ee 100644
+--- a/ThirdParty/Arm_ASR/tools/ffx_shader_compiler/src/compiler.h
++++ b/ThirdParty/Arm_ASR/tools/ffx_shader_compiler/src/compiler.h
+@@ -87,18 +87,19 @@ struct IReflectionData
+ /// @ingroup ShaderCompiler
+ struct Permutation
+ {
+-    uint32_t                            key = 0;                    ///< Shader permutation key identifier.
+-       bool                                                            usesBalanced = false;           ///< Shader uses Balanced preset
+-       bool                                                            usesPerformance = false;        ///< Shader uses performance preset
+-    std::string                         hashDigest;                 ///< Shader permutation hash key.
+-    std::string                         name;                       ///< Shader permutation name.
+-    std::string                         headerFileName;             ///< Shader permutation header file name.
+-    std::vector<std::wstring>           defines;                    ///< Shader permutation defines.
+-    std::shared_ptr<IShaderBinary>      shaderBinary = nullptr;     ///< Shader permutation compiled binary data.
+-    std::shared_ptr<IReflectionData>    reflectionData = nullptr;   ///< Shader permutation <c><i>IReflectionData</i></c> data.
++    uint32_t                            key = 0;                                               ///< Shader permutation key identifier.
++       bool                                                            usesBalanced = false;                   ///< Shader uses Balanced preset
++       bool                                                            usesPerformance = false;                ///< Shader uses performance preset
++       bool                                                            usesUltraPerformance = false;   ///< Shader uses ultra performance preset
++    std::string                         hashDigest;                                            ///< Shader permutation hash key.
++    std::string                         name;                                                  ///< Shader permutation name.
++    std::string                         headerFileName;                                        ///< Shader permutation header file name.
++    std::vector<std::wstring>           defines;                                               ///< Shader permutation defines.
++    std::shared_ptr<IShaderBinary>      shaderBinary = nullptr;                        ///< Shader permutation compiled binary data.
++    std::shared_ptr<IReflectionData>    reflectionData = nullptr;              ///< Shader permutation <c><i>IReflectionData</i></c> data.
+
+-    fs::path                            sourcePath;                 ///< Shader source file path for this permutation.
+-    std::unordered_set<std::string>     dependencies;               ///< List of shader dependencies for this permutation.
++    fs::path                            sourcePath;                                            ///< Shader source file path for this permutation.
++    std::unordered_set<std::string>     dependencies;                                  ///< List of shader dependencies for this permutation.
+ };
+
+ /// A structure defining the compiler interface. Should be sub-classed for each
+diff --git a/ThirdParty/Arm_ASR/tools/ffx_shader_compiler/src/ffx_sc.cpp b/ThirdParty/Arm_ASR/tools/ffx_shader_compiler/src/ffx_sc.cpp
+index 918d233a6..87eaad016 100644
+--- a/ThirdParty/Arm_ASR/tools/ffx_shader_compiler/src/ffx_sc.cpp
++++ b/ThirdParty/Arm_ASR/tools/ffx_shader_compiler/src/ffx_sc.cpp
+@@ -480,6 +480,11 @@ static void fillPermutationShaderQualityMetadata(Permutation& permutation)
+                {
+                        permutation.usesPerformance = true;
+                }
++
++               if(arg.find("FFXM_FSR2_OPTION_SHADER_OPT_ULTRA_PERFORMANCE=1") != std::string::npos)
++               {
++                       permutation.usesUltraPerformance = true;
++               }
+        }
+ };
+
+diff --git a/ThirdParty/Arm_ASR/tools/ffx_shader_compiler/src/hlsl_compiler.cpp b/ThirdParty/Arm_ASR/tools/ffx_shader_compiler/src/hlsl_compiler.cpp
+index f1188d319..861e74b2c 100644
+--- a/ThirdParty/Arm_ASR/tools/ffx_shader_compiler/src/hlsl_compiler.cpp
++++ b/ThirdParty/Arm_ASR/tools/ffx_shader_compiler/src/hlsl_compiler.cpp
+@@ -798,7 +798,14 @@ bool HLSLCompiler::ExtractDXCReflectionData(Permutation& permutation)
+             {
+                 if (strcmp(outputs[i]->name, "out.var.SV_TARGET0") == 0)
+                 {
+-                    rtName = "rw_dilatedDepth";
++                                       if (permutation.usesUltraPerformance)
++                                       {
++                                               rtName = "rw_dilated_depth_motion_vectors_input_luma";
++                                       }
+                 }
+                 else if (strcmp(outputs[i]->name, "out.var.SV_TARGET1") == 0)
+                 {
+diff --git a/ThirdParty/Arm_ASR/tools/generate_prebuilt_shaders.py b/ThirdParty/Arm_ASR/tools/generate_prebuilt_shaders.py
+index c70c36a6d..a93b94c6a 100644
+--- a/ThirdParty/Arm_ASR/tools/generate_prebuilt_shaders.py
++++ b/ThirdParty/Arm_ASR/tools/generate_prebuilt_shaders.py
+@@ -36,6 +36,7 @@ def main():
+        fsr2_permutation_args += " -DFFXM_FSR2_OPTION_APPLY_SHARPENING={0,1}"
+        fsr2_permutation_args += " -DFFXM_FSR2_OPTION_SHADER_OPT_BALANCED={0,1}"
+        fsr2_permutation_args += " -DFFXM_FSR2_OPTION_SHADER_OPT_PERFORMANCE={0,1}"
++       fsr2_permutation_args += " -DFFXM_FSR2_OPTION_SHADER_OPT_ULTRA_PERFORMANCE={0,1}"
+
+        fsr2_include_args = "-I "+script_folder+"/../include/gpu/"+" -I "+script_folder+"/../include/gpu/fsr2"
 diff --git a/./a/ffx_shader_compiler/src/compiler.h b/./b/ffx_shader_compiler/src/compiler.h
 index d79e63e..f77f8de 100755
 --- a/./a/ffx_shader_compiler/src/compiler.h

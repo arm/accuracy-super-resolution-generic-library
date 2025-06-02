@@ -1,5 +1,5 @@
 // Copyright  © 2023 Advanced Micro Devices, Inc.
-// Copyright  © 2024 Arm Limited.
+// Copyright  © 2024-2025 Arm Limited.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -48,7 +48,8 @@ key.FFXM_FSR2_OPTION_JITTERED_MOTION_VECTORS = FFXM_CONTAINS_FLAG(options, FSR2_
 key.FFXM_FSR2_OPTION_INVERTED_DEPTH = FFXM_CONTAINS_FLAG(options, FSR2_SHADER_PERMUTATION_DEPTH_INVERTED);                   \
 key.FFXM_FSR2_OPTION_APPLY_SHARPENING = FFXM_CONTAINS_FLAG(options, FSR2_SHADER_PERMUTATION_ENABLE_SHARPENING); \
 key.FFXM_FSR2_OPTION_SHADER_OPT_BALANCED = FFXM_CONTAINS_FLAG(options, FSR2_SHADER_PERMUTATION_APPLY_BALANCED_OPT); \
-key.FFXM_FSR2_OPTION_SHADER_OPT_PERFORMANCE = FFXM_CONTAINS_FLAG(options, FSR2_SHADER_PERMUTATION_APPLY_PERFORMANCE_OPT);
+key.FFXM_FSR2_OPTION_SHADER_OPT_PERFORMANCE = FFXM_CONTAINS_FLAG(options, FSR2_SHADER_PERMUTATION_APPLY_PERFORMANCE_OPT); \
+key.FFXM_FSR2_OPTION_SHADER_OPT_ULTRA_PERFORMANCE = FFXM_CONTAINS_FLAG(options, FSR2_SHADER_PERMUTATION_APPLY_ULTRA_PERFORMANCE_OPT);
 
 static FfxmShaderBlob fsr2GetDepthClipPassPermutationBlobByIndex(uint32_t permutationOptions, [[maybe_unused]] bool isWave64, [[maybe_unused]] bool is16bit)
 {

@@ -1,5 +1,5 @@
 // Copyright  © 2023 Advanced Micro Devices, Inc.
-// Copyright  © 2024 Arm Limited.
+// Copyright  © 2024-2025 Arm Limited.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -357,7 +357,9 @@ void ReprojectHistoryColor(const AccumulationPassCommonParams params, FFXM_PARAM
 #endif
 
     //Compute temporal reactivity info
-#if FFXM_SHADER_QUALITY_OPT_SEPARATE_TEMPORAL_REACTIVE
+#if FFXM_FSR2_OPTION_SHADER_OPT_ULTRA_PERFORMANCE
+    fTemporalReactiveFactor = 0.0;
+#elif FFXM_SHADER_QUALITY_OPT_SEPARATE_TEMPORAL_REACTIVE
     fTemporalReactiveFactor = FfxFloat16(ffxSaturate(abs(SampleTemporalReactive(params.fReprojectedHrUv))));
 #else
     fTemporalReactiveFactor = FfxFloat16(ffxSaturate(abs(fHistory.w)));

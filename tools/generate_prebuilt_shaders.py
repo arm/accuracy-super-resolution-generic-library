@@ -36,6 +36,7 @@ def main():
 	fsr2_permutation_args += " -DFFXM_FSR2_OPTION_APPLY_SHARPENING={0,1}"
 	fsr2_permutation_args += " -DFFXM_FSR2_OPTION_SHADER_OPT_BALANCED={0,1}"
 	fsr2_permutation_args += " -DFFXM_FSR2_OPTION_SHADER_OPT_PERFORMANCE={0,1}"
+	fsr2_permutation_args += " -DFFXM_FSR2_OPTION_SHADER_OPT_ULTRA_PERFORMANCE={0,1}"
 
 	fsr2_include_args = "-I "+script_folder+"/../include/gpu/"+" -I "+script_folder+"/../include/gpu/fsr2"
 

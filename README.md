@@ -161,6 +161,7 @@ The following table shows the list of the different shader mutators that can be 
 | FFXM_FSR2_OPTION_APPLY_SHARPENING | If **1**, informs the shaders that RCAS (sharpening) pass will be used. |
 | FFXM_FSR2_OPTION_SHADER_OPT_BALANCED | If **1**, enables a batch of optimizations when the **Balanced** quality preset is selected. |
 | FFXM_FSR2_OPTION_SHADER_OPT_PERFORMANCE | If **1**,  enables a batch of optimizations when the **Performance** quality preset is selected. When this is enabled then **FFXM_FSR2_OPTION_SHADER_OPT_BALANCED** will be enabled too. |
+| FFXM_FSR2_OPTION_SHADER_OPT_ULTRA_PERFORMANCE | If **1**,  enables a batch of optimizations when the **Ultra Performance** quality preset is selected.
 
 Lastly, when using an HLSL-based workflow, we also have the **FFXM_HLSL_6_2** global define. If defined with a value of **1**, this will enable the use of explicit 16 bit types instead of relying in **half** (RelaxedPrecision). The **VK_KHR_shader_float16_int8** extension is required on Vulkan.
 

@@ -81,6 +81,8 @@ static const ResourceBinding srvTextureBindingTable[] =
     {FFXM_FSR2_RESOURCE_IDENTIFIER_DILATED_REACTIVE_MASKS,                   L"r_dilated_reactive_masks"},
     {FFXM_FSR2_RESOURCE_IDENTIFIER_NEW_LOCKS,                                L"r_new_locks"},
     {FFXM_FSR2_RESOURCE_IDENTIFIER_LOCK_INPUT_LUMA,                          L"r_lock_input_luma"},
+    {FFXM_FSR2_RESOURCE_IDENTIFIER_DILATED_DEPTH_MOTION_VECTORS_INPUT_LUMA,  L"r_dilated_depth_motion_vectors_input_luma"},
+	{FFXM_FSR2_RESOURCE_IDENTIFIER_PREV_DILATED_DEPTH_MOTION_VECTORS_INPUT_LUMA, L"r_prev_dilated_depth_motion_vectors_input_luma"},
 };
 
 static const ResourceBinding uavTextureBindingTable[] =
@@ -101,6 +103,7 @@ static const ResourceBinding uavTextureBindingTable[] =
     {FFXM_FSR2_RESOURCE_IDENTIFIER_NEW_LOCKS,                               L"rw_new_locks"},
     {FFXM_FSR2_RESOURCE_IDENTIFIER_LOCK_INPUT_LUMA,                         L"rw_lock_input_luma"},
     {FFXM_FSR2_RESOURCE_IDENTIFIER_AUTOREACTIVE,                            L"rw_output_autoreactive"},
+    {FFXM_FSR2_RESOURCE_IDENTIFIER_DILATED_DEPTH_MOTION_VECTORS_INPUT_LUMA, L"rw_dilated_depth_motion_vectors_input_luma"},
 };
 
 static const ResourceBinding rtTextureBindingTable[] = {
@@ -115,6 +118,7 @@ static const ResourceBinding rtTextureBindingTable[] = {
 	{FFXM_FSR2_RESOURCE_IDENTIFIER_DILATED_DEPTH, L"rw_dilatedDepth"},
 	{FFXM_FSR2_RESOURCE_IDENTIFIER_LOCK_INPUT_LUMA, L"rw_lock_input_luma"},
     {FFXM_FSR2_RESOURCE_IDENTIFIER_AUTOREACTIVE, L"rw_output_autoreactive"},
+    {FFXM_FSR2_RESOURCE_IDENTIFIER_DILATED_DEPTH_MOTION_VECTORS_INPUT_LUMA, L"rw_dilated_depth_motion_vectors_input_luma"},
 };
 
 static const ResourceBinding constantBufferBindingTable[] =
@@ -395,6 +399,7 @@ static uint32_t getPipelinePermutationFlags(FfxmFsr2ShaderQualityMode qualityMod
 	// Apply flags for shader quality presets
 	flags |= (qualityMode == FFXM_FSR2_SHADER_QUALITY_MODE_BALANCED) ? FSR2_SHADER_PERMUTATION_APPLY_BALANCED_OPT : 0;
 	flags |= (qualityMode == FFXM_FSR2_SHADER_QUALITY_MODE_PERFORMANCE) ? (FSR2_SHADER_PERMUTATION_APPLY_BALANCED_OPT | FSR2_SHADER_PERMUTATION_APPLY_PERFORMANCE_OPT) : 0;
+    flags |= (qualityMode == FFXM_FSR2_SHADER_QUALITY_MODE_ULTRA_PERFORMANCE) ? FSR2_SHADER_PERMUTATION_APPLY_ULTRA_PERFORMANCE_OPT : 0;
 
 	// Indicate if running on GLES 3.2
 	flags |= (contextFlags & FFXM_FSR2_OPENGL_ES_3_2) ? FSR2_SHADER_PERMUTATION_PLATFORM_GLES_3_2 : 0;
@@ -558,6 +563,7 @@ static FfxmErrorCode fsr2Create(FfxmFsr2Context_Private* context, const FfxmFsr2
     float defaultExposure[] = { 0.0f, 0.0f };
     const FfxmResourceType texture1dResourceType = (context->contextDescription.flags & FFXM_FSR2_ENABLE_TEXTURE1D_USAGE) ? FFXM_RESOURCE_TYPE_TEXTURE1D : FFXM_RESOURCE_TYPE_TEXTURE2D;
 
+    const bool applyUltraPerformanceOptimizations = contextDescription->qualityMode == FFXM_FSR2_SHADER_QUALITY_MODE_ULTRA_PERFORMANCE;
 	const bool applyPerfModeOptimizations = contextDescription->qualityMode == FFXM_FSR2_SHADER_QUALITY_MODE_PERFORMANCE;
 	const bool applyBalancedModeOptimizations = contextDescription->qualityMode == FFXM_FSR2_SHADER_QUALITY_MODE_BALANCED;
 	const bool isBalancedOrPerformance = applyBalancedModeOptimizations || applyPerfModeOptimizations;
@@ -638,13 +644,90 @@ static FfxmErrorCode fsr2Create(FfxmFsr2Context_Private* context, const FfxmFsr2
             FFXM_SURFACE_FORMAT_R8_UNORM, contextDescription->maxRenderSize.width, contextDescription->maxRenderSize.height, 1, FFXM_RESOURCE_FLAGS_NONE },
     };
 
+    const FfxmInternalResourceDescription internalSurfaceDescUltraPerformance[] = {
+		{FFXM_FSR2_RESOURCE_IDENTIFIER_RECONSTRUCTED_PREVIOUS_NEAREST_DEPTH, L"FSR2_ReconstructedPrevNearestDepth333", FFXM_RESOURCE_TYPE_TEXTURE2D,
+		 FFXM_RESOURCE_USAGE_UAV, FFXM_SURFACE_FORMAT_R32_UINT, contextDescription->maxRenderSize.width, contextDescription->maxRenderSize.height, 1,
+		 FFXM_RESOURCE_FLAGS_ALIASABLE},
+
+		{FFXM_FSR2_RESOURCE_IDENTIFIER_DILATED_DEPTH_MOTION_VECTORS_INPUT_LUMA_1, L"FSR2_DilatedDepthMotionVectorsInputLuma1", FFXM_RESOURCE_TYPE_TEXTURE2D,
+		 (FfxmResourceUsage)(FFXM_RESOURCE_USAGE_RENDERTARGET), FFXM_SURFACE_FORMAT_R16G16B16A16_FLOAT, contextDescription->maxRenderSize.width,
+		 contextDescription->maxRenderSize.height, 1, FFXM_RESOURCE_FLAGS_NONE},
+
+		{FFXM_FSR2_RESOURCE_IDENTIFIER_DILATED_DEPTH_MOTION_VECTORS_INPUT_LUMA_2, L"FSR2_DilatedDepthMotionVectorsInputLuma2", FFXM_RESOURCE_TYPE_TEXTURE2D,
+		 (FfxmResourceUsage)(FFXM_RESOURCE_USAGE_RENDERTARGET), FFXM_SURFACE_FORMAT_R16G16B16A16_FLOAT,contextDescription->maxRenderSize.width,
+		 contextDescription->maxRenderSize.height, 1, FFXM_RESOURCE_FLAGS_NONE},
+
+		{FFXM_FSR2_RESOURCE_IDENTIFIER_LOCK_STATUS_1, L"FSR2_LockStatus1", FFXM_RESOURCE_TYPE_TEXTURE2D,
+		 (FfxmResourceUsage)(FFXM_RESOURCE_USAGE_RENDERTARGET), FFXM_SURFACE_FORMAT_R16G16_FLOAT, contextDescription->displaySize.width,
+		 contextDescription->displaySize.height, 1, FFXM_RESOURCE_FLAGS_NONE},
+
+		{FFXM_FSR2_RESOURCE_IDENTIFIER_LOCK_STATUS_2, L"FSR2_LockStatus2", FFXM_RESOURCE_TYPE_TEXTURE2D,
+		 (FfxmResourceUsage)(FFXM_RESOURCE_USAGE_RENDERTARGET), FFXM_SURFACE_FORMAT_R16G16_FLOAT, contextDescription->displaySize.width,
+		 contextDescription->displaySize.height, 1, FFXM_RESOURCE_FLAGS_NONE},
+
+		{FFXM_FSR2_RESOURCE_IDENTIFIER_NEW_LOCKS, L"FSR2_NewLocks", FFXM_RESOURCE_TYPE_TEXTURE2D, (FfxmResourceUsage)(FFXM_RESOURCE_USAGE_UAV),
+		 formatR8Workaround, contextDescription->displaySize.width, contextDescription->displaySize.height, 1, FFXM_RESOURCE_FLAGS_ALIASABLE},
+
+		{FFXM_FSR2_RESOURCE_IDENTIFIER_INTERNAL_UPSCALED_COLOR_1, L"FSR2_InternalUpscaled1", FFXM_RESOURCE_TYPE_TEXTURE2D,
+		 (FfxmResourceUsage)(FFXM_RESOURCE_USAGE_RENDERTARGET), FFXM_SURFACE_FORMAT_R11G11B10_FLOAT,
+		 contextDescription->displaySize.width, contextDescription->displaySize.height, 1, FFXM_RESOURCE_FLAGS_NONE},
+
+		{FFXM_FSR2_RESOURCE_IDENTIFIER_INTERNAL_UPSCALED_COLOR_2, L"FSR2_InternalUpscaled2", FFXM_RESOURCE_TYPE_TEXTURE2D,
+		 (FfxmResourceUsage)(FFXM_RESOURCE_USAGE_RENDERTARGET), FFXM_SURFACE_FORMAT_R11G11B10_FLOAT,
+		 contextDescription->displaySize.width, contextDescription->displaySize.height, 1, FFXM_RESOURCE_FLAGS_NONE},
+
+		{FFXM_FSR2_RESOURCE_IDENTIFIER_SCENE_LUMINANCE, L"FSR2_ExposureMips", FFXM_RESOURCE_TYPE_TEXTURE2D, FFXM_RESOURCE_USAGE_UAV,
+		 formatR16FWorkaround, contextDescription->maxRenderSize.width / 2, contextDescription->maxRenderSize.height / 2, 0,
+		 FFXM_RESOURCE_FLAGS_ALIASABLE},
+
+		{FFXM_FSR2_RESOURCE_IDENTIFIER_SPD_ATOMIC_COUNT, L"FSR2_SpdAtomicCounter", FFXM_RESOURCE_TYPE_TEXTURE2D, FFXM_RESOURCE_USAGE_UAV,
+		 FFXM_SURFACE_FORMAT_R32_UINT, 1, 1, 1, FFXM_RESOURCE_FLAGS_ALIASABLE, sizeof(atomicInitData), &atomicInitData},
+
+		{FFXM_FSR2_RESOURCE_IDENTIFIER_DILATED_REACTIVE_MASKS, L"FSR2_DilatedReactiveMasks", FFXM_RESOURCE_TYPE_TEXTURE2D,
+		 FFXM_RESOURCE_USAGE_RENDERTARGET, FFXM_SURFACE_FORMAT_R8G8_UNORM, contextDescription->maxRenderSize.width,
+		 contextDescription->maxRenderSize.height, 1, FFXM_RESOURCE_FLAGS_ALIASABLE},
+
+		{FFXM_FSR2_RESOURCE_IDENTIFIER_LANCZOS_LUT, L"FSR2_LanczosLutData", FFXM_RESOURCE_TYPE_TEXTURE2D, FFXM_RESOURCE_USAGE_READ_ONLY,
+		 FFXM_SURFACE_FORMAT_R16_SNORM, lanczos2LutWidth, 1, 1, FFXM_RESOURCE_FLAGS_NONE, sizeof(lanczos2Weights), lanczos2Weights},
+
+		{FFXM_FSR2_RESOURCE_IDENTIFIER_INTERNAL_DEFAULT_REACTIVITY, L"FSR2_DefaultReactiviyMask", FFXM_RESOURCE_TYPE_TEXTURE2D,
+		 FFXM_RESOURCE_USAGE_READ_ONLY, FFXM_SURFACE_FORMAT_R8_UNORM, 1, 1, 1, FFXM_RESOURCE_FLAGS_NONE, sizeof(defaultReactiveMaskData),
+		 &defaultReactiveMaskData},
+
+		{FFXM_FSR2_RESOURCE_IDENTITIER_UPSAMPLE_MAXIMUM_BIAS_LUT, L"FSR2_MaximumUpsampleBias", FFXM_RESOURCE_TYPE_TEXTURE2D,
+		 FFXM_RESOURCE_USAGE_READ_ONLY, FFXM_SURFACE_FORMAT_R16_SNORM, FFXM_FSR2_MAXIMUM_BIAS_TEXTURE_WIDTH, FFXM_FSR2_MAXIMUM_BIAS_TEXTURE_HEIGHT, 1,
+		 FFXM_RESOURCE_FLAGS_NONE, sizeof(maximumBias), maximumBias},
+
+		{FFXM_FSR2_RESOURCE_IDENTIFIER_INTERNAL_DEFAULT_EXPOSURE, L"FSR2_DefaultExposure", FFXM_RESOURCE_TYPE_TEXTURE2D,
+		 FFXM_RESOURCE_USAGE_READ_ONLY, FFXM_SURFACE_FORMAT_R32G32_FLOAT, 1, 1, 1, FFXM_RESOURCE_FLAGS_NONE, sizeof(defaultExposure),
+		 defaultExposure},
+
+		{FFXM_FSR2_RESOURCE_IDENTIFIER_AUTO_EXPOSURE, L"FSR2_AutoExposure", FFXM_RESOURCE_TYPE_TEXTURE2D,
+		 (FfxmResourceUsage)(FFXM_RESOURCE_USAGE_UAV | FFXM_RESOURCE_USAGE_RENDERTARGET), formatRG16FWorkaround, 1, 1, 1, FFXM_RESOURCE_FLAGS_NONE},
+
+		// only one for now, will need ping pong to respect the motion vectors
+		{FFXM_FSR2_RESOURCE_IDENTIFIER_AUTOREACTIVE, L"FSR2_AutoReactive", FFXM_RESOURCE_TYPE_TEXTURE2D, FFXM_RESOURCE_USAGE_UAV,
+		 FFXM_SURFACE_FORMAT_R8_UNORM, contextDescription->maxRenderSize.width, contextDescription->maxRenderSize.height, 1,
+		 FFXM_RESOURCE_FLAGS_NONE},
+	};
+
     // clear the SRV resources to NULL.
     memset(context->srvResources, 0, sizeof(context->srvResources));
 
 	// Generally used resources by all presets
-    for (int32_t currentSurfaceIndex = 0; currentSurfaceIndex < FFXM_ARRAY_ELEMENTS(internalSurfaceDesc); ++currentSurfaceIndex)
-	{
-		FFXM_VALIDATE(createResourceFromDescription(context, &internalSurfaceDesc[currentSurfaceIndex]));
+    if (applyUltraPerformanceOptimizations)
+    {
+        for(int32_t currentSurfaceIndex = 0; currentSurfaceIndex < FFXM_ARRAY_ELEMENTS(internalSurfaceDescUltraPerformance); ++currentSurfaceIndex)
+		{
+			FFXM_VALIDATE(createResourceFromDescription(context, &internalSurfaceDescUltraPerformance[currentSurfaceIndex]));
+		}
+    }
+    else
+    {
+        for (int32_t currentSurfaceIndex = 0; currentSurfaceIndex < FFXM_ARRAY_ELEMENTS(internalSurfaceDesc); ++currentSurfaceIndex)
+        {
+            FFXM_VALIDATE(createResourceFromDescription(context, &internalSurfaceDesc[currentSurfaceIndex]));
+        }
     }
 
 	// Additional textures used by either balanced or performance presets
@@ -942,6 +1025,9 @@ static FfxmErrorCode fsr2Dispatch(FfxmFsr2Context_Private* context, const FfxmFs
     const uint32_t lumaHistorySrvResourceIndex = isOddFrame ? FFXM_FSR2_RESOURCE_IDENTIFIER_LUMA_HISTORY_2 : FFXM_FSR2_RESOURCE_IDENTIFIER_LUMA_HISTORY_1;
     const uint32_t lumaHistoryRtResourceIndex = isOddFrame ? FFXM_FSR2_RESOURCE_IDENTIFIER_LUMA_HISTORY_1 : FFXM_FSR2_RESOURCE_IDENTIFIER_LUMA_HISTORY_2;
 
+    const uint32_t dilatedDepthMotionVectorsInputLumaIndex = isOddFrame ? FFXM_FSR2_RESOURCE_IDENTIFIER_DILATED_DEPTH_MOTION_VECTORS_INPUT_LUMA_2 : FFXM_FSR2_RESOURCE_IDENTIFIER_DILATED_DEPTH_MOTION_VECTORS_INPUT_LUMA_1;
+	const uint32_t previousDilatedDepthMotionVectorsInputLumaIndex = isOddFrame ? FFXM_FSR2_RESOURCE_IDENTIFIER_DILATED_DEPTH_MOTION_VECTORS_INPUT_LUMA_1 : FFXM_FSR2_RESOURCE_IDENTIFIER_DILATED_DEPTH_MOTION_VECTORS_INPUT_LUMA_2;
+
     const bool resetAccumulation = params->reset || context->firstExecution;
     context->firstExecution = false;
 
@@ -988,6 +1074,10 @@ static FfxmErrorCode fsr2Dispatch(FfxmFsr2Context_Private* context, const FfxmFs
 
     context->rtResources[FFXM_FSR2_RESOURCE_IDENTIFIER_LUMA_HISTORY] = context->rtResources[lumaHistoryRtResourceIndex];
     context->srvResources[FFXM_FSR2_RESOURCE_IDENTIFIER_LUMA_HISTORY] = context->srvResources[lumaHistorySrvResourceIndex];
+
+    context->srvResources[FFXM_FSR2_RESOURCE_IDENTIFIER_DILATED_DEPTH_MOTION_VECTORS_INPUT_LUMA] = context->srvResources[dilatedDepthMotionVectorsInputLumaIndex];
+	context->rtResources[FFXM_FSR2_RESOURCE_IDENTIFIER_DILATED_DEPTH_MOTION_VECTORS_INPUT_LUMA] = context->rtResources[dilatedDepthMotionVectorsInputLumaIndex];
+	context->srvResources[FFXM_FSR2_RESOURCE_IDENTIFIER_PREV_DILATED_DEPTH_MOTION_VECTORS_INPUT_LUMA] = context->srvResources[previousDilatedDepthMotionVectorsInputLumaIndex];
 
     // actual resource size may differ from render/display resolution (e.g. due to Hw/API restrictions), so query the descriptor for UVs adjustment
     const FfxmResourceDescription resourceDescInputColor = context->contextDescription.backendInterface.fpGetResourceDescription(&context->contextDescription.backendInterface, context->srvResources[FFXM_FSR2_RESOURCE_IDENTIFIER_INPUT_COLOR]);
@@ -1074,6 +1164,7 @@ static FfxmErrorCode fsr2Dispatch(FfxmFsr2Context_Private* context, const FfxmFs
     const int32_t dispatchDstX = FFXM_DIVIDE_ROUNDING_UP(context->contextDescription.displaySize.width, threadGroupWorkRegionDim);
     const int32_t dispatchDstY = FFXM_DIVIDE_ROUNDING_UP(context->contextDescription.displaySize.height, threadGroupWorkRegionDim);
 
+    const bool applyUltraPerformanceOptimizations = context->contextDescription.qualityMode == FFXM_FSR2_SHADER_QUALITY_MODE_ULTRA_PERFORMANCE;
 	const bool applyPerfModeOptimizations = context->contextDescription.qualityMode == FFXM_FSR2_SHADER_QUALITY_MODE_PERFORMANCE;
 	const bool applyBalancedModeOptimizations = context->contextDescription.qualityMode == FFXM_FSR2_SHADER_QUALITY_MODE_BALANCED;
 	const bool isBalancedOrPerformance = applyBalancedModeOptimizations || applyPerfModeOptimizations;
@@ -1146,7 +1237,10 @@ static FfxmErrorCode fsr2Dispatch(FfxmFsr2Context_Private* context, const FfxmFs
 	const uint32_t renderW = context->constants.renderSize[0];
 	const uint32_t renderH = context->constants.renderSize[1];
 
-	scheduleDispatch(context, params, &context->pipelineComputeLuminancePyramid, dispatchThreadGroupCountXY[0], dispatchThreadGroupCountXY[1]);
+    if (!applyUltraPerformanceOptimizations)
+    {
+        scheduleDispatch(context, params, &context->pipelineComputeLuminancePyramid, dispatchThreadGroupCountXY[0], dispatchThreadGroupCountXY[1]);
+    }
 	scheduleFragment(context, params, &context->pipelineReconstructPreviousDepth, renderW, renderH);
 	scheduleFragment(context, params, &context->pipelineDepthClip, renderW, renderH);
 
