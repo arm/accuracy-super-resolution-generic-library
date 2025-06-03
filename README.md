@@ -48,7 +48,7 @@ Arm ASR uses temporal accumulation to reconstruct high-resolution images while m
 
 To quickly integrate Arm ASR, which means the built-in standalone backend is used, you could follow the steps below:
 
-1. Copy **Arm_ASR** directory into your project, and add **Arm_ASR/src/backends/shared/blob_accessors/prebuilt_shaders** in incude path if you want to use prebuilt shaders.
+1. Copy **Arm_ASR** directory into your project, and add **Arm_ASR/src/backends/shared/blob_accessors/prebuilt_shaders** in include path if you want to use prebuilt shaders.
 
 2. Include the [`ffxm_fsr2.h`](./include/host/ffxm_fsr2.h#L1) and [`ffxm_vk.h`](./include/host/backends/vk/ffxm_vk.h#L1) header file in your codebase where you wish to interact with the technique.
 
@@ -150,7 +150,7 @@ Depending on your target hardware and operating configuration Arm ASR will opera
 - **FFXM_HLSL**. If defined, the logic will fallback to use the **HLSL** specific syntax (i.e types, resource declaration ...).
 - **FFXM_GLSL**. If defined, the logic will fallback to use the **GLSL** specific syntax (i.e types, resource declaration ...).
 
-The following table shows the list of the different shader mutators that can be used. All of them must be defined wither with a value or o or 1. Which shader variant to use is guided internally by **getPipelinePermutationFlags(...)** based on things like user's flags and shader quality.
+The following table shows the list of the different shader mutators that can be used. All of them must be defined either with a value of 0 or 1. Which shader variant to use is guided internally by **getPipelinePermutationFlags(...)** based on things like user's flags and shader quality.
 
 | Define | Description |
 | -------- | ------- |
@@ -341,4 +341,4 @@ You can reach out to us on the following email address: <arm-asr-support@arm.com
 
 ## Security Issues
 
-Arm takes security isses seriously please see [Security](SECURITY.md) for more details.
+Arm takes security issues seriously please see [Security](SECURITY.md) for more details.
