@@ -27,12 +27,12 @@
 #pragma once
 
 #ifdef FFXM_VKLOADER_VOLK
-#if FFXM_FSR2_PLATFORM_LINUX
+#if defined(__linux__)
 #	define VK_USE_PLATFORM_XCB_KHR 1
 #	define VK_USE_PLATFORM_XLIB_KHR 1
-#elif FFXM_FSR2_PLATFORM_WINDOWS
+#elif defined(_WIN32)
 #	define VK_USE_PLATFORM_WIN32_KHR 1
-#elif FFXM_FSR2_PLATFORM_ANDROID
+#elif defined(__ANDROID__)
 #	define VK_USE_PLATFORM_ANDROID_KHR 1
 #else
 #	error Not implemented
