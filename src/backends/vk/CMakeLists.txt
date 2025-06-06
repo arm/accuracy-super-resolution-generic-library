@@ -173,13 +173,6 @@ include_directories(${FFXM_VULKAN_PATH})
 
 # Add some defines
 target_compile_definitions(Arm_ASR_backend PUBLIC FFXM_VKLOADER_VOLK=1)
-if(WINDOWS)
-	target_compile_definitions(Arm_ASR_backend PUBLIC FFXM_FSR2_PLATFORM_WINDOWS=1)
-elseif(LINUX)
-	target_compile_definitions(Arm_ASR_backend PUBLIC FFXM_FSR2_PLATFORM_LINUX=1)
-elseif(ANDROID)
-	target_compile_definitions(Arm_ASR_backend PUBLIC FFXM_FSR2_PLATFORM_ANDROID=1)
-endif()
 
 get_filename_component(FFXM_PASS_SHADER_OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR}/../shaders/vk ABSOLUTE)
 include_directories(${FFXM_PASS_SHADER_OUTPUT_PATH})

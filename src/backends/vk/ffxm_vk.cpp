@@ -381,7 +381,7 @@ FfxmUInt32 findMemoryTypeIndex(VkPhysicalDevice physicalDevice, VkMemoryRequirem
     for (FfxmUInt32 i = 0; i < memProperties.memoryTypeCount; i++) {
         if ((memRequirements.memoryTypeBits & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & requestedProperties)) {
 
-#ifndef FFXM_FSR2_PLATFORM_ANDROID
+#ifndef __ANDROID__
             // if just device-local memory is requested, make sure this is the invisible heap to prevent over-subscribing the local heap
             if (requestedProperties == VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT && (memProperties.memoryTypes[i].propertyFlags & VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT))
                 continue;
