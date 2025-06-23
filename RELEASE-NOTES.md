@@ -1,6 +1,12 @@
 <!-- Copyright © 2024-2025 Arm Limited.
 SPDX-License-Identifier: MIT -->
 
+## 25.06 Release
+
+- Added a new experimental Ultra Performance shader quality preset
+- Added documentation to allow external contributions
+- Typo fixes
+
 ## Initial Public Release
 
 **Arm® Accuracy Super Resolution™** is a mobile-optimized temporal upscaling technique derived from AMD's [FidelityFX™ Super Resolution 2 v2.2.2](https://github.com/GPUOpen-LibrariesAndSDKs/FidelityFX-SDK/blob/main/docs/techniques/super-resolution-temporal.md). Arm ASR includes multiple optimizations on top of the original **FidelityFX™ Super Resolution 2** to make the technique suited for the more resource-constrained environment of mobile gaming. The team would like to express their gratitude to AMD and the engineers behind the original technique for their work and releasing it publicly to the world.
