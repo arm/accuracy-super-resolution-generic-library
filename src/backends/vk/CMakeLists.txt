@@ -124,10 +124,13 @@ file(GLOB_RECURSE PRIVATE_SHADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/shaders/*.hlsl")
 
 file(GLOB PRIVATE_SOURCE
-	"${FFXM_SRC_BACKENDS_PATH}/shared/*.h"
-	"${FFXM_SRC_BACKENDS_PATH}/shared/*.cpp"
-	"${FFXM_SRC_BACKENDS_PATH}/shared/blob_accessors/"
-	"${FFXM_SRC_BACKENDS_PATH}/shared/blob_accessors/"
+    "${FFXM_SRC_BACKENDS_PATH}/shared/*.h"
+    "${FFXM_SRC_BACKENDS_PATH}/shared/*.cpp"
+    "${FFXM_SRC_BACKENDS_PATH}/shared/blob_accessors/"
+    "${FFXM_SRC_BACKENDS_PATH}/shared/blob_accessors/"
+    "${FFXM_SRC_BACKENDS_PATH}/shared/blob_accessors/prebuild_shaders/"
+    "${FFXM_SRC_BACKENDS_PATH}/shared/blob_accessors/prebuild_shaders/*.h"
+    "${FFXM_SRC_BACKENDS_PATH}/shared/blob_accessors/prebuild_shaders/*.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/*.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
 

@@ -211,8 +211,8 @@ typedef struct BackendContext_VK {
         PFN_vkCmdDraw                       vkCmdDraw = 0;
     } VkFunctionTable;
 
-    VkDevice                device = nullptr;
-    VkPhysicalDevice        physicalDevice = nullptr;
+    VkDevice                device = VK_NULL_HANDLE;
+    VkPhysicalDevice        physicalDevice = VK_NULL_HANDLE;
     VkFunctionTable         vkFunctionTable = {};
 
     FfxmGpuJobDescription*   pGpuJobs;
@@ -223,7 +223,7 @@ typedef struct BackendContext_VK {
     } VkResourceView;
     VkResourceView*         pResourceViews;
 
-    VkDeviceMemory          ringBufferMemory = nullptr;
+    VkDeviceMemory          ringBufferMemory = VK_NULL_HANDLE;
     VkMemoryPropertyFlags   ringBufferMemoryProperties = 0;
     UniformBuffer*          pRingBuffer;
     FfxmUInt32                ringBufferBase = 0;
@@ -265,7 +265,7 @@ typedef struct BackendContext_VK {
     EffectContext*          pEffectContexts;
 
     FfxmUInt32               numDeviceExtensions = 0;
-    VkExtensionProperties*  extensionProperties = nullptr;
+    VkExtensionProperties*  extensionProperties = VK_NULL_HANDLE;
 
 } BackendContext_VK;
 
@@ -2245,7 +2245,7 @@ FfxmErrorCode CreateComputePipelineVK(FfxmInterface* backendInterface,
     pipelineCreateInfo.layout = pPipelineLayout->pipelineLayout;
 
     VkPipeline computePipeline = VK_NULL_HANDLE;
-    if (backendContext->vkFunctionTable.vkCreateComputePipelines(backendContext->device, nullptr, 1, &pipelineCreateInfo, nullptr, &computePipeline) != VK_SUCCESS) {
+    if (backendContext->vkFunctionTable.vkCreateComputePipelines(backendContext->device, VK_NULL_HANDLE, 1, &pipelineCreateInfo, nullptr, &computePipeline) != VK_SUCCESS) {
         return FFXM_ERROR_BACKEND_API_ERROR;
     }
 

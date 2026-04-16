@@ -49,7 +49,11 @@ else()
 endif()
 
 # compile all the shaders
-compile_shaders("${FFXM_SC_EXECUTABLE}" "${FSR2_BASE_ARGS}" "${FSR2_HLSL_BASE_ARGS}" "${FSR2_GLSL_BASE_ARGS}" "${FSR2_PERMUTATION_ARGS}" "${FSR2_INCLUDE_ARGS}" "${FSR2_SHADERS}" FSR2_PERMUTATION_OUTPUTS)
+if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
+    compile_shaders("${FFXM_SC_EXECUTABLE}" "--glsl" "${FSR2_BASE_ARGS}" "${FSR2_HLSL_BASE_ARGS}" "${FSR2_GLSL_BASE_ARGS}" "${FSR2_PERMUTATION_ARGS}" "${FSR2_INCLUDE_ARGS}" "${FSR2_SHADERS}" FSR2_PERMUTATION_OUTPUTS)
+else()
+    compile_shaders("${FFXM_SC_EXECUTABLE}" "${FSR2_BASE_ARGS}" "${FSR2_HLSL_BASE_ARGS}" "${FSR2_GLSL_BASE_ARGS}" "${FSR2_PERMUTATION_ARGS}" "${FSR2_INCLUDE_ARGS}" "${FSR2_SHADERS}" FSR2_PERMUTATION_OUTPUTS)
+endif()
 
 # add the header files they generate to the main list of dependencies
 add_shader_output("${FSR2_PERMUTATION_OUTPUTS}")
