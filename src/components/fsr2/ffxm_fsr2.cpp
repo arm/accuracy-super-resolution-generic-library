@@ -41,6 +41,8 @@
 
 #include "ffxm_fsr2_private.h"
 
+#include <wchar.h>
+
 namespace arm
 {
 // max queued frames for descriptor management

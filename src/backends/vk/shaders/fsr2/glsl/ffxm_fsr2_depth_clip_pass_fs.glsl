@@ -25,15 +25,22 @@
 #extension GL_EXT_samplerless_texture_functions : require
 
 #define FSR2_BIND_SRV_RECONSTRUCTED_PREV_NEAREST_DEPTH      0
+#if FFXM_FSR2_OPTION_SHADER_OPT_ULTRA_PERFORMANCE
+#define FSR2_BIND_SRV_DILATED_DEPTH_MOTION_VECTORS_INPUT_LUMA 1
+#define FSR2_BIND_SRV_PREV_DILATED_DEPTH_MOTION_VECTORS_INPUT_LUMA 2
+#else
 #define FSR2_BIND_SRV_DILATED_MOTION_VECTORS                1
 #define FSR2_BIND_SRV_DILATED_DEPTH                         2
 #define FSR2_BIND_SRV_REACTIVE_MASK                         3
 #define FSR2_BIND_SRV_TRANSPARENCY_AND_COMPOSITION_MASK     4
 #define FSR2_BIND_SRV_PREVIOUS_DILATED_MOTION_VECTORS       5
+#endif
 #define FSR2_BIND_SRV_INPUT_MOTION_VECTORS                  6
 #define FSR2_BIND_SRV_INPUT_COLOR                           7
 #define FSR2_BIND_SRV_INPUT_DEPTH                           8
+#if !FFXM_FSR2_OPTION_SHADER_OPT_ULTRA_PERFORMANCE
 #define FSR2_BIND_SRV_INPUT_EXPOSURE                        9
+#endif
 
 #define FSR2_BIND_CB_FSR2                                   0
 
@@ -54,7 +61,9 @@
 #include "fsr2/ffxm_fsr2_depth_clip.h"
 
 layout (location = 0) out FfxFloat32x2 rw_dilated_reactive_masks;
+#if !FFXM_FSR2_OPTION_SHADER_OPT_ULTRA_PERFORMANCE
 layout (location = 1) out FfxFloat32x4 rw_prepared_input_color;
+#endif
 
 void main()
 {
@@ -63,5 +72,7 @@ void main()
 	DepthClipOutputs result = DepthClip(uPixelCoord);
 
     rw_dilated_reactive_masks = result.fDilatedReactiveMasks;
+#if !FFXM_FSR2_OPTION_SHADER_OPT_ULTRA_PERFORMANCE
     rw_prepared_input_color = result.fTonemapped;
+#endif
 }

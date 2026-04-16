@@ -279,7 +279,7 @@ void PreProcessReactiveMasks(FfxInt32x2 iPxLrPos, FfxFloat32 fMotionDivergence, 
             FFXM_MIN16_F fTransparencyAndCompositionSample = fTransparencyAndCompositionSamples[sampleIdx];
 
             const FfxFloat32 fMaxLenSq = ffxMax(dot(fReferenceColor, fReferenceColor), dot(fColorSample, fColorSample));
-            const FFXM_MIN16_F fSimilarity = dot(fReferenceColor, fColorSample) / fMaxLenSq;
+            const FFXM_MIN16_F fSimilarity = FFXM_MIN16_F(dot(fReferenceColor, fColorSample) / fMaxLenSq);
 
             // Increase power for non-similar samples
             const FFXM_MIN16_F fPowerBiasMax = FFXM_MIN16_F(6.0f);

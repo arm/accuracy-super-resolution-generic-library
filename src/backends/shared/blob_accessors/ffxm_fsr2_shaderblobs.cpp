@@ -23,14 +23,14 @@
 #include "ffxm_fsr2_shaderblobs.h"
 #include "fsr2/ffxm_fsr2_private.h"
 
-#include <ffxm_fsr2_autogen_reactive_pass_fs_16bit_permutations.h>
-#include <ffxm_fsr2_accumulate_pass_fs_16bit_permutations.h>
-#include <ffxm_fsr2_compute_luminance_pyramid_pass_16bit_permutations.h>
-#include <ffxm_fsr2_depth_clip_pass_fs_16bit_permutations.h>
-#include <ffxm_fsr2_lock_pass_16bit_permutations.h>
-#include <ffxm_fsr2_reconstruct_previous_depth_pass_fs_16bit_permutations.h>
-#include <ffxm_fsr2_rcas_pass_fs_16bit_permutations.h>
-#include <ffxm_fsr2_vs_16bit_permutations.h>
+#include "prebuilt_shaders/ffxm_fsr2_autogen_reactive_pass_fs_16bit_permutations.h"
+#include "prebuilt_shaders/ffxm_fsr2_accumulate_pass_fs_16bit_permutations.h"
+#include "prebuilt_shaders/ffxm_fsr2_compute_luminance_pyramid_pass_16bit_permutations.h"
+#include "prebuilt_shaders/ffxm_fsr2_depth_clip_pass_fs_16bit_permutations.h"
+#include "prebuilt_shaders/ffxm_fsr2_lock_pass_16bit_permutations.h"
+#include "prebuilt_shaders/ffxm_fsr2_reconstruct_previous_depth_pass_fs_16bit_permutations.h"
+#include "prebuilt_shaders/ffxm_fsr2_rcas_pass_fs_16bit_permutations.h"
+#include "prebuilt_shaders/ffxm_fsr2_vs_16bit_permutations.h"
 
 #include <string.h> // for memset
 
