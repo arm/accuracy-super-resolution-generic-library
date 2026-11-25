@@ -58,14 +58,14 @@ void Accumulate(const AccumulationPassCommonParams params, FFXM_PARAMETER_INOUT 
     // Aviod invalid values when accumulation and upsampled weight is 0
     fAccumulation = ffxMax(FSR2_EPSILON.xxx, fAccumulation + fUpsampledColorAndWeight.www);
 
-#if FFXM_FSR2_OPTION_HDR_COLOR_INPUT
 #if FFXM_SHADER_QUALITY_OPT_TONEMAPPED_RGB_PREPARED_INPUT_COLOR
+    // PreparedInputColor is tonemapped RGB whether or not the input is HDR, so blend the history in the
+    // same space.
     fHistoryColor = Tonemap(fHistoryColor);
-#else
+#elif FFXM_FSR2_OPTION_HDR_COLOR_INPUT
     //YCoCg -> RGB -> Tonemap -> YCoCg (Use RGB tonemapper to avoid color desaturation)
     fUpsampledColorAndWeight.xyz = RGBToYCoCg(Tonemap(YCoCgToRGB(fUpsampledColorAndWeight.xyz)));
     fHistoryColor = RGBToYCoCg(Tonemap(YCoCgToRGB(fHistoryColor)));
-#endif
 #endif
 
     const FfxFloat32x3 fAlpha = fUpsampledColorAndWeight.www / fAccumulation;
@@ -75,7 +75,7 @@ void Accumulate(const AccumulationPassCommonParams params, FFXM_PARAMETER_INOUT 
     fHistoryColor = YCoCgToRGB(fHistoryColor);
 #endif
 
-#if FFXM_FSR2_OPTION_HDR_COLOR_INPUT
+#if FFXM_FSR2_OPTION_HDR_COLOR_INPUT || FFXM_SHADER_QUALITY_OPT_TONEMAPPED_RGB_PREPARED_INPUT_COLOR
     fHistoryColor = InverseTonemap(fHistoryColor);
 #endif
 }
